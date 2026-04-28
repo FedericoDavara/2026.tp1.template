@@ -1,42 +1,29 @@
-import model.Categoria;
-import model.Ebook;
-import model.LibroFisico;
+import model.*;
+import repository.impl.LibroRepositoryInMemory;
+import service.LibroService;
+import service.impl.LibroServiceImpl;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        // 📚 Crear un libro físico
-        LibroFisico libroFisico = new LibroFisico(
-                "123456",
-                "Programación para principiantes",
-                "Jose Hernandez",
-                2022,
-                Categoria.PROGRAMACION,
-                5 // cantidad de ejemplares
-        );
+        // 🔌 Inyección de dependencias manual
+        var repo = new LibroRepositoryInMemory();
+        LibroService service = new LibroServiceImpl(repo);
 
-        // 📱 Crear un ebook
-        Ebook ebook = new Ebook(
-                "7891011",
-                "Design Patterns",
-                "GoF",
-                1994,
-                Categoria.PROGRAMACION,
-                "PDF"
-        );
+        // 📚 Crear libros
+        var libro1 = new LibroFisico("1", "Programación para principiantes", "Jose Hernandez", 2022, Categoria.PROGRAMACION, 5);
+        var libro2 = new Ebook("2", "Redes Modernas", "Tanenbaum", 2010, Categoria.REDES, "PDF");
 
-        // 🖨️ Mostrar datos
-        System.out.println("=== LIBRO FÍSICO ===");
-        System.out.println("ISBN: " + libroFisico.isbn());
-        System.out.println("Título: " + libroFisico.titulo());
-        System.out.println("Autor: " + libroFisico.autor());
-        System.out.println("Ejemplares: " + libroFisico.getCantidadEjemplares());
+        // 💾 Guardar
+        service.registrarLibro(libro1);
+        service.registrarLibro(libro2);
 
-        System.out.println("\n=== EBOOK ===");
-        System.out.println("ISBN: " + ebook.isbn());
-        System.out.println("Título: " + ebook.titulo());
-        System.out.println("Autor: " + ebook.autor());
-        System.out.println("Formato: " + ebook.getFormato());
+        // 🔍 Buscar
+        System.out.println("Buscar por título:");
+        service.buscarPorTitulo("programación").forEach(System.out::println);
+
+        System.out.println("\nBuscar por categoría:");
+        service.buscarPorCategoria("REDES").forEach(System.out::println);
     }
 }
