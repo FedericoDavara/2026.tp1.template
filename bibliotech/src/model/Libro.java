@@ -1,50 +1,36 @@
 package model;
 
-public record Libro(
+public abstract class Libro implements Recurso {
 
-        // ISBN único del libro
-        String isbn,
+    protected String isbn;
+    protected String titulo;
+    protected String autor;
+    protected int anio;
+    protected Categoria categoria;
 
-        // Título del libro
-        String titulo,
+    public Libro(String isbn, String titulo, String autor, int anio, Categoria categoria) {
 
-        // Autor del libro
-        String autor,
-
-        // Año de publicación
-        int anio,
-
-        // Categoría del libro (enum)
-        Categoria categoria
-
-) implements Recurso {
-
-    public Libro {
-
-        // Validación de ISBN
         if (isbn == null || isbn.isBlank()) {
             throw new IllegalArgumentException("El ISBN no puede estar vacío");
         }
-
-        // Validación de título
         if (titulo == null || titulo.isBlank()) {
             throw new IllegalArgumentException("El título no puede estar vacío");
         }
-
-        // Validación de autor
         if (autor == null || autor.isBlank()) {
             throw new IllegalArgumentException("El autor no puede estar vacío");
         }
-
-        // Validación de año
         if (anio <= 0) {
             throw new IllegalArgumentException("El año debe ser válido");
         }
-
-        // Validación de categoría
         if (categoria == null) {
             throw new IllegalArgumentException("La categoría no puede ser nula");
         }
+
+        this.isbn = isbn;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.anio = anio;
+        this.categoria = categoria;
     }
 
     @Override
@@ -55,5 +41,17 @@ public record Libro(
     @Override
     public String titulo() {
         return titulo;
+    }
+
+    public String autor() {
+        return autor;
+    }
+
+    public int anio() {
+        return anio;
+    }
+
+    public Categoria categoria() {
+        return categoria;
     }
 }
