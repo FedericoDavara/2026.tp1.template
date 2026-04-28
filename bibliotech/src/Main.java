@@ -6,6 +6,8 @@ import service.LibroService;
 import service.SocioService;
 import service.impl.LibroServiceImpl;
 import service.impl.SocioServiceImpl;
+import repository.impl.PrestamoRepositoryInMemory;
+import model.Prestamo;
 
 public class Main {
 
@@ -31,16 +33,12 @@ public class Main {
         var socioRepo = new SocioRepositoryInMemory();
         SocioService socioService = new SocioServiceImpl(socioRepo);
 
+        Socio socio1 = new Estudiante(1, "Juan", "juan@mail.com", "123");
+        Socio socio2 = new Docente(2, "Ana", "ana@mail.com", "456");
+
         try {
-            var s1 = new Estudiante(1, "Juan", "juan@mail.com", "123");
-            var s2 = new Docente(2, "Ana", "ana@mail.com", "456");
-
-            socioService.registrarSocio(s1);
-            socioService.registrarSocio(s2);
-
-            //  Intento duplicado (debe fallar)
-            var s3 = new Estudiante(3, "Pedro", "pedro@mail.com", "123");
-            socioService.registrarSocio(s3);
+            socioService.registrarSocio(socio1);
+            socioService.registrarSocio(socio2);
 
         } catch (SocioException e) {
             System.out.println("Error: " + e.getMessage());
@@ -59,5 +57,20 @@ public class Main {
                             + s.getLimitePrestamos() + " libros"
             );
         }
+        System.out.println("\n=========== PRÉSTAMOS ===========");
+
+        var prestamoRepo = new PrestamoRepositoryInMemory();
+
+        // usamos datos que ya tenías
+        var prestamo1 = new Prestamo("P1", libro1, socio1);
+
+        prestamoRepo.guardar(prestamo1);
+
+        // mostrar todos
+        prestamoRepo.buscarTodos().forEach(System.out::println);
+
+        // mostrar activos
+        System.out.println("\nPréstamos activos:");
+        prestamoRepo.buscarActivos().forEach(System.out::println);
     }
 }
