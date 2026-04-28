@@ -54,4 +54,12 @@ public abstract class Libro implements Recurso {
     public Categoria categoria() {
         return categoria;
     }
+    @Override
+    public String toString() {
+        return "ISBN: " + isbn +
+                ", Título: " + titulo +
+                ", Autor: " + autor +
+                ", Año: " + anio +
+                ", Categoría: " + categoria;
+    }
 }
