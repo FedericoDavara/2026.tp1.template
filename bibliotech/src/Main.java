@@ -8,6 +8,10 @@ import service.impl.LibroServiceImpl;
 import service.impl.SocioServiceImpl;
 import repository.impl.PrestamoRepositoryInMemory;
 import model.Prestamo;
+import exception.PrestamoException;
+import repository.impl.PrestamoRepositoryInMemory;
+import service.PrestamoService;
+import service.impl.PrestamoServiceImpl;
 
 public class Main {
 
@@ -61,16 +65,26 @@ public class Main {
 
         var prestamoRepo = new PrestamoRepositoryInMemory();
 
-        // usamos datos que ya tenías
-        var prestamo1 = new Prestamo("P1", libro1, socio1);
+        PrestamoService prestamoService = new PrestamoServiceImpl(
+                libroRepo,
+                socioRepo,
+                prestamoRepo
+        );
 
-        prestamoRepo.guardar(prestamo1);
+        try {
+            prestamoService.realizarPrestamo("P1", "1", 1);
+            prestamoService.realizarPrestamo("P2", "1", 1);
+            prestamoService.realizarPrestamo("P3", "1", 1);
 
-        // mostrar todos
+            // Este rompe el límite
+            prestamoService.realizarPrestamo("P4", "1", 1);
+
+        } catch (Exception e) {
+            System.out.println("Error controlado: " + e.getMessage());
+        }
+
+        //  Mostrar préstamos cargados
+        System.out.println("\nPréstamos registrados:");
         prestamoRepo.buscarTodos().forEach(System.out::println);
-
-        // mostrar activos
-        System.out.println("\nPréstamos activos:");
-        prestamoRepo.buscarActivos().forEach(System.out::println);
     }
 }
