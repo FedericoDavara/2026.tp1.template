@@ -1,67 +1,59 @@
+import exception.SocioException;
 import model.*;
 import repository.impl.LibroRepositoryInMemory;
 import repository.impl.SocioRepositoryInMemory;
 import service.LibroService;
+import service.SocioService;
 import service.impl.LibroServiceImpl;
+import service.impl.SocioServiceImpl;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        // ================= LIBROS =================
         System.out.println("=========== LIBROS ===========");
 
-        // 🔌 Inyección de dependencias (libros)
         var libroRepo = new LibroRepositoryInMemory();
         LibroService libroService = new LibroServiceImpl(libroRepo);
 
-        // 📚 Crear libros
-        var libro1 = new LibroFisico("1", "Python para principiantes", "Jose hernandez", 2022, Categoria.PROGRAMACION, 5);
+        var libro1 = new LibroFisico("1", "Python para principiantes", "Jose Hernandez", 2022, Categoria.PROGRAMACION, 5);
         var libro2 = new Ebook("2", "Redes Modernas", "Tanenbaum", 2010, Categoria.REDES, "PDF");
 
-        // 💾 Guardar libros
         libroService.registrarLibro(libro1);
         libroService.registrarLibro(libro2);
 
-        // 🔍 Buscar libros
-        System.out.println("\nBuscar por título:");
-        libroService.buscarPorTitulo("Python").forEach(System.out::println);
+        libroService.buscarTodos().forEach(System.out::println);
 
-        System.out.println("\nBuscar por categoría:");
-        libroService.buscarPorCategoria("REDES").forEach(System.out::println);
-
-        // ==========================================
-
+        // ================= SOCIOS =================
         System.out.println("\n=========== SOCIOS ===========");
 
-        // 📦 Repository de socios (sin service todavía)
         var socioRepo = new SocioRepositoryInMemory();
+        SocioService socioService = new SocioServiceImpl(socioRepo);
 
-        // 👤 Crear socios
-        Socio socio1 = new Estudiante(1, "Juan Pérez", "juan@mail.com", "12345678");
-        Socio socio2 = new Docente(2, "Ana López", "ana@mail.com", "87654321");
+        try {
+            var s1 = new Estudiante(1, "Juan", "juan@mail.com", "123");
+            var s2 = new Docente(2, "Ana", "ana@mail.com", "456");
 
-        // 💾 Guardar socios
-        socioRepo.guardar(socio1);
-        socioRepo.guardar(socio2);
+            socioService.registrarSocio(s1);
+            socioService.registrarSocio(s2);
 
-        // 🖨️ Mostrar todos
-        System.out.println("\nListado de socios:");
-        socioRepo.buscarTodos().forEach(System.out::println);
+            //  Intento duplicado (debe fallar)
+            var s3 = new Estudiante(3, "Pedro", "pedro@mail.com", "123");
+            socioService.registrarSocio(s3);
 
-        // 🔍 Buscar por DNI
-        System.out.println("\nBuscar socio por DNI (12345678):");
-        socioRepo.buscarPorDni("12345678")
-                .ifPresentOrElse(
-                        System.out::println,
-                        () -> System.out.println("Socio no encontrado")
-                );
+        } catch (SocioException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
 
-        // ==========================================
+        // Mostrar socios válidos
+        System.out.println("\nSocios registrados:");
+        socioService.listarSocios().forEach(System.out::println);
 
-        System.out.println("\n=========== POLIMORFISMO ===========");
+        // ================= POLIMORFISMO =================
+        System.out.println("\n=========== Prueba de POLIMORFISMO ===========");
 
-        // 🔥 Demostración importante para la nota
-        for (Socio s : socioRepo.buscarTodos()) {
+        for (Socio s : socioService.listarSocios()) {
             System.out.println(
                     s.getNombre() + " puede pedir hasta "
                             + s.getLimitePrestamos() + " libros"

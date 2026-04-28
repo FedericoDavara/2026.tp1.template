@@ -15,4 +15,6 @@ public interface LibroService {
     List<Libro> buscarPorAutor(String autor);
 
     List<Libro> buscarPorCategoria(String categoria);
+
+    List<Libro> buscarTodos();
 }

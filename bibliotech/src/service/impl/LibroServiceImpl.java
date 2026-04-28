@@ -34,4 +34,8 @@ public class LibroServiceImpl implements LibroService {
     public List<Libro> buscarPorCategoria(String categoria) {
         return libroRepository.buscarPorCategoria(categoria);
     }
+    @Override
+    public List<Libro> buscarTodos() {
+        return libroRepository.buscarTodos();
+    }
 }
