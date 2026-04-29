@@ -9,6 +9,8 @@ import repository.LibroRepository;
 import repository.PrestamoRepository;
 import repository.SocioRepository;
 import service.PrestamoService;
+import exception.PrestamoException;
+import java.util.List;
 
 public class PrestamoServiceImpl implements PrestamoService {
 
@@ -29,15 +31,15 @@ public class PrestamoServiceImpl implements PrestamoService {
     @Override
     public void realizarPrestamo(String idPrestamo, String isbn, int socioId) {
 
-        // 🔍 Buscar libro
+        //  Buscar libro
         Libro libro = libroRepo.buscarPorId(isbn)
                 .orElseThrow(() -> new LibroNoDisponibleException("Libro no encontrado"));
 
-        // 🔍 Buscar socio
+        //  Buscar socio
         Socio socio = socioRepo.buscarPorId(socioId)
                 .orElseThrow(() -> new RuntimeException("Socio no encontrado"));
 
-        // 🔴 VALIDACIÓN 1: disponibilidad (libro físico)
+        //  VALIDACIÓN 1: disponibilidad (libro físico)
         if (libro instanceof model.LibroFisico fisico) {
 
             long prestamosActivos = prestamoRepo.buscarActivos().stream()
@@ -49,7 +51,7 @@ public class PrestamoServiceImpl implements PrestamoService {
             }
         }
 
-        // 🔴 VALIDACIÓN 2: límite de préstamos del socio
+        // VALIDACIÓN 2: límite de préstamos del socio
         long prestamosSocio = prestamoRepo.buscarActivos().stream()
                 .filter(p -> p.getSocio().getId() == socioId)
                 .count();
@@ -58,9 +60,31 @@ public class PrestamoServiceImpl implements PrestamoService {
             throw new LimitePrestamosException("El socio alcanzó su límite de préstamos");
         }
 
-        // ✅ Crear préstamo
+        // Crear préstamo
         Prestamo prestamo = new Prestamo(idPrestamo, libro, socio);
 
         prestamoRepo.guardar(prestamo);
+    }
+
+    @Override
+    public void devolverPrestamo(String idPrestamo) {
+
+        var prestamo = prestamoRepo.buscarPorId(idPrestamo)
+                .orElseThrow(() -> new PrestamoException("Préstamo no encontrado"));
+
+        if (!prestamo.estaActivo()) {
+            throw new PrestamoException("El préstamo ya fue devuelto");
+        }
+
+        prestamo.devolver();
+    }
+    @Override
+    public List<Prestamo> listarActivos() {
+        return prestamoRepo.buscarActivos();
+    }
+
+    @Override
+    public List<Prestamo> listarTodos() {
+        return prestamoRepo.buscarTodos();
     }
 }
