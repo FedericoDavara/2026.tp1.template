@@ -71,20 +71,33 @@ public class Main {
                 prestamoRepo
         );
 
+        //  Crear préstamos
         try {
             prestamoService.realizarPrestamo("P1", "1", 1);
             prestamoService.realizarPrestamo("P2", "1", 1);
             prestamoService.realizarPrestamo("P3", "1", 1);
 
-            // Este rompe el límite
-            prestamoService.realizarPrestamo("P4", "1", 1);
-
-        } catch (Exception e) {
-            System.out.println("Error controlado: " + e.getMessage());
+        } catch (PrestamoException e) {
+            System.out.println("Error: " + e.getMessage());
         }
 
-        //  Mostrar préstamos cargados
-        System.out.println("\nPréstamos registrados:");
-        prestamoRepo.buscarTodos().forEach(System.out::println);
+        //  Mostrar activos
+        System.out.println("\nPréstamos activos:");
+        prestamoService.listarActivos().forEach(System.out::println);
+
+        // Devolver un libro
+        try {
+            prestamoService.devolverPrestamo("P1");
+        } catch (PrestamoException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        // Activos después de devolución
+        System.out.println("\nPréstamos activos después de devolver uno:");
+        prestamoService.listarActivos().forEach(System.out::println);
+
+        // Historial completo
+        System.out.println("\nHistorial completo:");
+        prestamoService.listarTodos().forEach(System.out::println);
     }
 }
